@@ -16,3 +16,16 @@ func (api *PluginAPI) BatchAddChannelMember(channelIds []string, userID string) 
 
 	return api.app.BatchAddChannelMember(api.ctx, userID, channels)
 }
+
+func (api *PluginAPI) BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError {
+	if len(channelIds) == 0 {
+		return nil
+	}
+
+	channels, err := api.app.GetChannelsById(channelIds)
+	if err != nil {
+		return err
+	}
+
+	return api.app.BatchDeleteChannelMember(api.ctx, userID, channels)
+}

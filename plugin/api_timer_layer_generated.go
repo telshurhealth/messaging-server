@@ -1183,3 +1183,10 @@ func (api *apiTimerLayer) BatchAddChannelMember(channelIds []string, userID stri
 	api.recordTime(startTime, "BatchAddChannelMember", _returnsB == nil)
 	return _returnsA, _returnsB
 }
+
+func (api *apiTimerLayer) BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError {
+	startTime := timePkg.Now()
+	_returnsA := api.apiImpl.BatchDeleteChannelMember(channelIds, userID)
+	api.recordTime(startTime, "BatchDeleteChannelMember", _returnsA == nil)
+	return _returnsA
+}

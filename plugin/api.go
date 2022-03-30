@@ -1106,6 +1106,8 @@ type API interface {
 	RequestTrialLicense(requesterID string, users int, termsAccepted bool, receiveEmailsAccepted bool) *model.AppError
 
 	BatchAddChannelMember(channelIds []string, userID string) ([]*model.ChannelMember, *model.AppError)
+
+	BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError
 }
 
 var handshake = plugin.HandshakeConfig{

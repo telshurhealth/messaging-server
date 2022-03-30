@@ -5342,3 +5342,32 @@ func (s *apiRPCServer) BatchAddChannelMember(args *Z_BatchAddChannelMemberArgs, 
 	}
 	return nil
 }
+
+type Z_BatchDeleteChannelMemberArgs struct {
+	A []string
+	B string
+}
+
+type Z_BatchDeleteChannelMemberReturns struct {
+	A *model.AppError
+}
+
+func (g *apiRPCClient) BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError {
+	_args := &Z_BatchDeleteChannelMemberArgs{channelIds, userID}
+	_returns := &Z_BatchDeleteChannelMemberReturns{}
+	if err := g.client.Call("Plugin.BatchDeleteChannelMember", _args, _returns); err != nil {
+		log.Printf("RPC call to BatchDeleteChannelMember API failed: %s", err.Error())
+	}
+	return _returns.A
+}
+
+func (s *apiRPCServer) BatchDeleteChannelMember(args *Z_BatchDeleteChannelMemberArgs, returns *Z_BatchDeleteChannelMemberReturns) error {
+	if hook, ok := s.impl.(interface {
+		BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError
+	}); ok {
+		returns.A = hook.BatchDeleteChannelMember(args.A, args.B)
+	} else {
+		return encodableError(fmt.Errorf("API BatchDeleteChannelMember called but not implemented."))
+	}
+	return nil
+}

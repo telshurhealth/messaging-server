@@ -28,7 +28,7 @@ func (a *App) BatchAddChannelMember(c *request.Context, userID string, channels 
 		return nil, err
 	}
 
-	channelMembers := make([]*model.ChannelMember, len(channels))
+	channelMembers := []*model.ChannelMember{}
 
 	for _, channel := range channels {
 		if member, err := a.Srv().Store.Channel().GetMember(context.Background(), channel.Id, userID); err != nil {
@@ -49,6 +49,7 @@ func (a *App) BatchAddChannelMember(c *request.Context, userID string, channels 
 		channelMembers = append(channelMembers, member)
 	}
 
+	// UserRemovedEvent happens to trigger required actions in webapp
 	message := model.NewWebSocketEvent(model.WebsocketEventUserRemoved, channels[0].TeamId, "", user.Id, nil)
 	message.Add("user_id", user.Id)
 	message.Add("team_id", channels[0].TeamId)
@@ -63,4 +64,49 @@ func (a *App) addUserToChannelWithoutMessage(user *model.User, channel *model.Ch
 		return nil, err
 	}
 	return newMember, nil
+}
+
+func (a *App) BatchDeleteChannelMember(c *request.Context, userID string, channels model.ChannelList) *model.AppError {
+	var user *model.User
+	var err *model.AppError
+
+	if user, err = a.GetUser(userID); err != nil {
+		return err
+	}
+
+	for _, channel := range channels {
+		err = a.deleteChannelMemberWithoutMessage(user, channel)
+		if err != nil {
+			return err
+		}
+	}
+
+	// UserRemovedEvent happens to trigger required actions in webapp
+	message := model.NewWebSocketEvent(model.WebsocketEventUserRemoved, channels[0].TeamId, "", user.Id, nil)
+	message.Add("user_id", user.Id)
+	message.Add("team_id", channels[0].TeamId)
+	a.Publish(message)
+
+	return nil
+}
+
+func (a *App) deleteChannelMemberWithoutMessage(user *model.User, channel *model.Channel) *model.AppError {
+	isGuest := user.IsGuest()
+	if channel.Name == model.DefaultChannelName {
+		if !isGuest {
+			return model.NewAppError("deleteChannelMemberWithoutMessage", "api.channel.remove.default.app_error", map[string]interface{}{"Channel": model.DefaultChannelName}, "", http.StatusBadRequest)
+		}
+	}
+
+	if err := a.Srv().Store.Channel().RemoveMember(channel.Id, user.Id); err != nil {
+		return model.NewAppError("deleteChannelMemberWithoutMessage", "app.channel.remove_member.app_error", nil, err.Error(), http.StatusInternalServerError)
+	}
+	if err := a.Srv().Store.ChannelMemberHistory().LogLeaveEvent(user.Id, channel.Id, model.GetMillis()); err != nil {
+		return model.NewAppError("deleteChannelMemberWithoutMessage", "app.channel_member_history.log_leave_event.internal_error", nil, err.Error(), http.StatusInternalServerError)
+	}
+
+	a.InvalidateCacheForUser(user.Id)
+	a.invalidateCacheForChannelMembers(channel.Id)
+
+	return nil
 }

@@ -407,6 +407,7 @@ type AppIface interface {
 	AutocompleteUsersInChannel(teamID string, channelID string, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInChannel, *model.AppError)
 	AutocompleteUsersInTeam(teamID string, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInTeam, *model.AppError)
 	BatchAddChannelMember(c *request.Context, userID string, channels model.ChannelList) ([]*model.ChannelMember, *model.AppError)
+	BatchDeleteChannelMember(c *request.Context, userID string, channels model.ChannelList) *model.AppError
 	BroadcastStatus(status *model.Status)
 	BuildPostReactions(postID string) (*[]ReactionImportData, *model.AppError)
 	BuildPushNotificationMessage(contentsConfig string, post *model.Post, user *model.User, channel *model.Channel, channelName string, senderName string, explicitMention bool, channelWideMention bool, replyToThreadType string) (*model.PushNotification, *model.AppError)
