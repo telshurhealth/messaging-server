@@ -1176,3 +1176,17 @@ func (api *apiTimerLayer) RequestTrialLicense(requesterID string, users int, ter
 	api.recordTime(startTime, "RequestTrialLicense", _returnsA == nil)
 	return _returnsA
 }
+
+func (api *apiTimerLayer) BatchAddChannelMember(channelIds []string, userID string) ([]*model.ChannelMember, *model.AppError) {
+	startTime := timePkg.Now()
+	_returnsA, _returnsB := api.apiImpl.BatchAddChannelMember(channelIds, userID)
+	api.recordTime(startTime, "BatchAddChannelMember", _returnsB == nil)
+	return _returnsA, _returnsB
+}
+
+func (api *apiTimerLayer) BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError {
+	startTime := timePkg.Now()
+	_returnsA := api.apiImpl.BatchDeleteChannelMember(channelIds, userID)
+	api.recordTime(startTime, "BatchDeleteChannelMember", _returnsA == nil)
+	return _returnsA
+}

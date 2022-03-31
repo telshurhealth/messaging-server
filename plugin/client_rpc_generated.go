@@ -5312,3 +5312,62 @@ func (s *apiRPCServer) RequestTrialLicense(args *Z_RequestTrialLicenseArgs, retu
 	}
 	return nil
 }
+
+type Z_BatchAddChannelMemberArgs struct {
+	A []string
+	B string
+}
+
+type Z_BatchAddChannelMemberReturns struct {
+	A []*model.ChannelMember
+	B *model.AppError
+}
+
+func (g *apiRPCClient) BatchAddChannelMember(channelIds []string, userID string) ([]*model.ChannelMember, *model.AppError) {
+	_args := &Z_BatchAddChannelMemberArgs{channelIds, userID}
+	_returns := &Z_BatchAddChannelMemberReturns{}
+	if err := g.client.Call("Plugin.BatchAddChannelMember", _args, _returns); err != nil {
+		log.Printf("RPC call to BatchAddChannelMember API failed: %s", err.Error())
+	}
+	return _returns.A, _returns.B
+}
+
+func (s *apiRPCServer) BatchAddChannelMember(args *Z_BatchAddChannelMemberArgs, returns *Z_BatchAddChannelMemberReturns) error {
+	if hook, ok := s.impl.(interface {
+		BatchAddChannelMember(channelIds []string, userID string) ([]*model.ChannelMember, *model.AppError)
+	}); ok {
+		returns.A, returns.B = hook.BatchAddChannelMember(args.A, args.B)
+	} else {
+		return encodableError(fmt.Errorf("API BatchAddChannelMember called but not implemented."))
+	}
+	return nil
+}
+
+type Z_BatchDeleteChannelMemberArgs struct {
+	A []string
+	B string
+}
+
+type Z_BatchDeleteChannelMemberReturns struct {
+	A *model.AppError
+}
+
+func (g *apiRPCClient) BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError {
+	_args := &Z_BatchDeleteChannelMemberArgs{channelIds, userID}
+	_returns := &Z_BatchDeleteChannelMemberReturns{}
+	if err := g.client.Call("Plugin.BatchDeleteChannelMember", _args, _returns); err != nil {
+		log.Printf("RPC call to BatchDeleteChannelMember API failed: %s", err.Error())
+	}
+	return _returns.A
+}
+
+func (s *apiRPCServer) BatchDeleteChannelMember(args *Z_BatchDeleteChannelMemberArgs, returns *Z_BatchDeleteChannelMemberReturns) error {
+	if hook, ok := s.impl.(interface {
+		BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError
+	}); ok {
+		returns.A = hook.BatchDeleteChannelMember(args.A, args.B)
+	} else {
+		return encodableError(fmt.Errorf("API BatchDeleteChannelMember called but not implemented."))
+	}
+	return nil
+}

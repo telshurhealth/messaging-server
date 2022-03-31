@@ -1104,6 +1104,10 @@ type API interface {
 	//
 	// Minimum server version: 5.36
 	RequestTrialLicense(requesterID string, users int, termsAccepted bool, receiveEmailsAccepted bool) *model.AppError
+
+	BatchAddChannelMember(channelIds []string, userID string) ([]*model.ChannelMember, *model.AppError)
+
+	BatchDeleteChannelMember(channelIds []string, userID string) *model.AppError
 }
 
 var handshake = plugin.HandshakeConfig{

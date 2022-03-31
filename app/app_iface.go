@@ -406,6 +406,8 @@ type AppIface interface {
 	AutocompleteChannelsForSearch(teamID string, userID string, term string) (model.ChannelList, *model.AppError)
 	AutocompleteUsersInChannel(teamID string, channelID string, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInChannel, *model.AppError)
 	AutocompleteUsersInTeam(teamID string, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInTeam, *model.AppError)
+	BatchAddChannelMember(c *request.Context, userID string, channels model.ChannelList) ([]*model.ChannelMember, *model.AppError)
+	BatchDeleteChannelMember(c *request.Context, userID string, channels model.ChannelList) *model.AppError
 	BroadcastStatus(status *model.Status)
 	BuildPostReactions(postID string) (*[]ReactionImportData, *model.AppError)
 	BuildPushNotificationMessage(contentsConfig string, post *model.Post, user *model.User, channel *model.Channel, channelName string, senderName string, explicitMention bool, channelWideMention bool, replyToThreadType string) (*model.PushNotification, *model.AppError)
@@ -570,6 +572,7 @@ type AppIface interface {
 	GetChannelPinnedPostCount(channelID string) (int64, *model.AppError)
 	GetChannelPoliciesForUser(userID string, offset, limit int) (*model.RetentionPolicyForChannelList, *model.AppError)
 	GetChannelUnread(channelID, userID string) (*model.ChannelUnread, *model.AppError)
+	GetChannelsById(channelIDs []string) (model.ChannelList, *model.AppError)
 	GetChannelsByNames(channelNames []string, teamID string) ([]*model.Channel, *model.AppError)
 	GetChannelsForRetentionPolicy(policyID string, offset, limit int) (*model.ChannelsWithCount, *model.AppError)
 	GetChannelsForScheme(scheme *model.Scheme, offset int, limit int) (model.ChannelList, *model.AppError)
