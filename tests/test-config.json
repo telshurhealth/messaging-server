@@ -57,7 +57,7 @@
         "EnableTutorial": true,
         "EnableOnboardingFlow": true,
         "ExperimentalEnableDefaultChannelLeaveJoinMessages": true,
-        "ExperimentalGroupUnreadChannels": "disabled",
+        "ExperimentalGroupUnreadChannels": true,
         "EnableAPITeamDeletion": false,
         "ExperimentalEnableHardenedMode": false
     },

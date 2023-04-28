@@ -2,7 +2,7 @@ version: '2.4'
 services:
   mysql:
     restart: 'no'
-    container_name: mattermost-mysql
+    container_name: telshurdb
     ports:
       - "3306:3306"
     extends:
@@ -10,7 +10,7 @@ services:
         service: mysql
   mysql-read-replica:
     restart: 'no'
-    container_name: mattermost-mysql-read-replica
+    container_name: telshurdb-read-replica
     ports:
       - "3307:3306"
     extends:

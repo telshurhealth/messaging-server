@@ -1,12 +1,12 @@
 version: '2.4'
 services:
-  mysql:
+  telshurdb:
     extends:
         file: docker-compose.common.yml
-        service: mysql
-    tmpfs: /var/lib/mysql
+        service: telshurdb
+    tmpfs: /var/lib/telshurdb
     volumes:
-     - "./docker/mysql.conf.d:/etc/mysql/conf.d"
+     - "./docker/telshurdb.conf.d:/etc/telshurdb/conf.d"
   postgres:
     extends:
         file: docker-compose.common.yml
@@ -50,7 +50,7 @@ services:
     networks:
       - mm-test
     depends_on:
-      - mysql
+      - telshurdb
       - postgres
       - minio
       - inbucket
@@ -58,7 +58,7 @@ services:
       - elasticsearch
       - prometheus
       - grafana
-    command: postgres:5432 mysql:3306 minio:9000 inbucket:9001 openldap:389 elasticsearch:9200 prometheus:9090 grafana:3000
+    command: postgres:5432 telshurdb:3306 minio:9000 inbucket:9001 openldap:389 elasticsearch:9200 prometheus:9090 grafana:3000
 
 networks:
   mm-test:
