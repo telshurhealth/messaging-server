@@ -179,9 +179,10 @@ else ifeq ($(MM_NO_DOCKER),true)
 else
 	@echo Starting docker containers
 
-	$(GO) run ./build/docker-compose-generator/main.go $(ENABLED_DOCKER_SERVICES) | docker-compose -f docker-compose.makefile.yml -f /dev/stdin run --rm start_dependencies
+	$(GO) run ./build/docker-compose-generator/main.go $(ENABLED_DOCKER_SERVICES) | docker compose -f docker-compose.makefile.yml -f /dev/stdin run -T --rm start_dependencies
 ifneq (,$(findstring openldap,$(ENABLED_DOCKER_SERVICES)))
-	cat tests/${LDAP_DATA}-data.ldif | docker-compose -f docker-compose.makefile.yml exec -T openldap bash -c 'ldapadd -x -D "cn=admin,dc=mm,dc=test,dc=com" -w mostest || true';
+	@echo Starting docker ldap
+	cat tests/${LDAP_DATA}-data.ldif | docker compose -f docker-compose.makefile.yml exec -T openldap bash -c 'ldapadd -x -D "cn=admin,dc=mm,dc=test,dc=com" -w mostest || true';
 endif
 ifneq (,$(findstring mysql-read-replica,$(ENABLED_DOCKER_SERVICES)))
 	./scripts/replica-mysql-config.sh
@@ -192,12 +193,12 @@ run-haserver:
 ifeq ($(BUILD_ENTERPRISE_READY),true)
 	@echo Starting mattermost in an HA topology '(3 node cluster)'
 
-	docker-compose -f docker-compose.yaml up --remove-orphans haproxy
+	docker compose -f docker-compose.yaml up --remove-orphans haproxy
 endif
 
 stop-haserver:
 	@echo Stopping docker containers for HA topology
-	docker-compose stop
+	docker compose stop 
 
 stop-docker: ## Stops the docker containers for local development.
 ifeq ($(MM_NO_DOCKER),true)
@@ -205,7 +206,7 @@ ifeq ($(MM_NO_DOCKER),true)
 else
 	@echo Stopping docker containers
 
-	docker-compose stop
+	docker compose stop 
 endif
 
 clean-docker: ## Deletes the docker containers for local development.
@@ -214,8 +215,8 @@ ifeq ($(MM_NO_DOCKER),true)
 else
 	@echo Removing docker containers
 
-	docker-compose down -v
-	docker-compose rm -v
+	docker compose down  -v
+	docker compose rm -v
 endif
 
 plugin-checker:
@@ -384,7 +385,7 @@ test-server-race: test-server-pre
     ifneq ($(MM_NO_DOCKER),true)
       ifneq ($(TEMP_DOCKER_SERVICES),)
 	      @echo Stopping temporary docker services
-	      docker-compose stop $(TEMP_DOCKER_SERVICES)
+	      docker compose stop  $(TEMP_DOCKER_SERVICES)
       endif
     endif
   endif
@@ -395,7 +396,7 @@ test-server: test-server-pre
     ifneq ($(MM_NO_DOCKER),true)
       ifneq ($(TEMP_DOCKER_SERVICES),)
 	      @echo Stopping temporary docker services
-	      docker-compose stop $(TEMP_DOCKER_SERVICES)
+	      docker compose stop  $(TEMP_DOCKER_SERVICES)
       endif
     endif
   endif
@@ -538,10 +539,10 @@ restart-server: | stop-server run-server ## Restarts the mattermost server to pi
 restart-haserver:
 	@echo Restarting mattermost in an HA topology
 
-	docker-compose restart follower2
-	docker-compose restart follower
-	docker-compose restart leader
-	docker-compose restart haproxy
+	docker compose restart follower2
+	docker compose restart follower
+	docker compose restart leader
+	docker compose restart haproxy
 
 restart-client: | stop-client run-client ## Restarts the webapp.
 
