@@ -464,8 +464,10 @@ build-templates: ## Compile all mjml email templates
 	cd $(TEMPLATES_DIR) && $(MAKE) build
 
 run-server: prepackaged-binaries validate-go-version start-docker ## Starts the server.
+	@echo Loading environment vars
+	$(shell source .deploy_local_environment)
+	
 	@echo Running mattermost for development
-
 	mkdir -p $(BUILD_WEBAPP_DIR)/dist/files
 	$(GO) run $(GOFLAGS) -ldflags '$(LDFLAGS)' $(PLATFORM_FILES) $(RUN_IN_BACKGROUND)
 

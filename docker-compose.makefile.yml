@@ -1,8 +1,7 @@
-version: '2.4'
 services:
   mysql:
-    restart: 'no'
-    container_name: telshurdb
+    restart: always
+    container_name: telshurdb-mysql
     ports:
       - "3306:3306"
     extends:
