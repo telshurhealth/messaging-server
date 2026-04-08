@@ -481,7 +481,7 @@ run-server-e2e: prepackaged-binaries validate-go-version start-docker ## Starts 
 	@echo Running mattermost for e2e tests on :8066 using config/config.e2e.json
 	mkdir -p $(BUILD_WEBAPP_DIR)/dist/files
 	mkdir -p ./data-e2e
-	MM_CONFIG=$(ROOT)config/config.e2e.json $(GO) run $(GOFLAGS) -ldflags '$(LDFLAGS)' $(PLATFORM_FILES) $(RUN_IN_BACKGROUND)
+	MM_CONFIG=$(ROOT)config/config.e2e.json $(GO) run $(GOFLAGS) -ldflags '$(LDFLAGS)' $(PLATFORM_FILES) --config=$(ROOT)config/config.e2e.json $(RUN_IN_BACKGROUND)
 
 debug-server: start-docker ## Compile and start server using delve.
 	mkdir -p $(BUILD_WEBAPP_DIR)/dist/files
@@ -534,6 +534,23 @@ else
 		kill $$PID; \
 	done
 	@for PID in $$(ps -ef | grep "[g]o-build" | grep "mattermost" | awk '{ print $$2 }'); do \
+		echo stopping mattermost $$PID; \
+		kill $$PID; \
+	done
+endif
+
+stop-server-e2e: ## Stops the e2e mattermost server (the one started with run-server-e2e).
+	@echo Stopping mattermost e2e
+
+ifeq ($(BUILDER_GOOS_GOARCH),"windows_amd64")
+	wmic process where "Caption='go.exe' and CommandLine like '%go.exe run%' and CommandLine like '%config.e2e.json%'" call terminate
+	wmic process where "Caption='mattermost.exe' and CommandLine like '%go-build%' and CommandLine like '%config.e2e.json%'" call terminate
+else
+	@for PID in $$(ps -ef | grep "[g]o run" | grep "mattermost" | grep "config.e2e.json" | awk '{ print $$2 }'); do \
+		echo stopping go $$PID; \
+		kill $$PID; \
+	done
+	@for PID in $$(ps -ef | grep "[g]o-build" | grep "mattermost" | grep "config.e2e.json" | awk '{ print $$2 }'); do \
 		echo stopping mattermost $$PID; \
 		kill $$PID; \
 	done
