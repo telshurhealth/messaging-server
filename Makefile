@@ -526,14 +526,14 @@ stop-server: ## Stops the server.
 	@echo Stopping mattermost
 
 ifeq ($(BUILDER_GOOS_GOARCH),"windows_amd64")
-	wmic process where "Caption='go.exe' and CommandLine like '%go.exe run%'" call terminate
-	wmic process where "Caption='mattermost.exe' and CommandLine like '%go-build%'" call terminate
+	wmic process where "Caption='go.exe' and CommandLine like '%go.exe run%' and not CommandLine like '%config.e2e.json%'" call terminate
+	wmic process where "Caption='mattermost.exe' and CommandLine like '%go-build%' and not CommandLine like '%config.e2e.json%'" call terminate
 else
-	@for PID in $$(ps -ef | grep "[g]o run" | grep "mattermost" | awk '{ print $$2 }'); do \
+	@for PID in $$(ps -ef | grep "[g]o run" | grep "mattermost" | grep -v "config.e2e.json" | awk '{ print $$2 }'); do \
 		echo stopping go $$PID; \
 		kill $$PID; \
 	done
-	@for PID in $$(ps -ef | grep "[g]o-build" | grep "mattermost" | awk '{ print $$2 }'); do \
+	@for PID in $$(ps -ef | grep "[g]o-build" | grep "mattermost" | grep -v "config.e2e.json" | awk '{ print $$2 }'); do \
 		echo stopping mattermost $$PID; \
 		kill $$PID; \
 	done
