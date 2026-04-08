@@ -97,6 +97,7 @@ web/sass-files/sass/.sass-cache/
 
 # Default local file storage
 data/*
+data-e2e/
 webapp/data/*
 api/data/*
 api4/data/*
