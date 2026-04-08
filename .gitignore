@@ -11,6 +11,7 @@ webapp/yarn-error.log
 mattermost.mattermost-license
 config/mattermost.mattermost-license
 config/config.json
+config/config.e2e.json
 config/*.crt
 
 web/static/js/bundle*.js

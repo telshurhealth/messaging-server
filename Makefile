@@ -466,10 +466,22 @@ build-templates: ## Compile all mjml email templates
 run-server: prepackaged-binaries validate-go-version start-docker ## Starts the server.
 	@echo Loading environment vars
 	$(shell source .deploy_local_environment)
-	
+
 	@echo Running mattermost for development
 	mkdir -p $(BUILD_WEBAPP_DIR)/dist/files
 	$(GO) run $(GOFLAGS) -ldflags '$(LDFLAGS)' $(PLATFORM_FILES) $(RUN_IN_BACKGROUND)
+
+run-server-e2e: prepackaged-binaries validate-go-version start-docker ## Starts a second mattermost server pointed at the telshur_e2e database (for plugin e2e tests).
+	@echo Loading environment vars
+	$(shell source .deploy_local_environment)
+
+	@echo Setting up e2e database from backup
+	bash $(ROOT)config/e2e_setup/setup_e2e_db.sh
+
+	@echo Running mattermost for e2e tests on :8066 using config/config.e2e.json
+	mkdir -p $(BUILD_WEBAPP_DIR)/dist/files
+	mkdir -p ./data-e2e
+	MM_CONFIG=$(ROOT)config/config.e2e.json $(GO) run $(GOFLAGS) -ldflags '$(LDFLAGS)' $(PLATFORM_FILES) $(RUN_IN_BACKGROUND)
 
 debug-server: start-docker ## Compile and start server using delve.
 	mkdir -p $(BUILD_WEBAPP_DIR)/dist/files
